@@ -1,0 +1,11 @@
+=========================
+ NTriple Line Parser
+=========================
+
+A simple, weak and hopefully fast tool to parse single lines of NTriple files.
+Can't handle anything special at all.
+
+Authors
+=======
+
+* Thomas Weißgerber
