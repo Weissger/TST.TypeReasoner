@@ -2,6 +2,8 @@
  rdf:type reasoner
 =========================
 
+Command line tool to manifest missing rdf:type triples of a rdf:type and rdfs:subClassOf net.
+
 TypeSimilarityToolSet: Reasoner to materialize type triples into a nt file or a store
 
 * Needs an initial fully reasoned subClassOf network in the store.
