@@ -1,6 +1,12 @@
 [submodule "src/TST.SparqlInterface"]
-	path = src/SparqlInterface/
+	path = src/SparqlInterface
 	url = https://github.com/Weissger/TST.SparqlInterface.git
 [submodule "src/TST.NTripleLineParser"]
+	path = src/NTripleLineParser/
+	url = https://github.com/Weissger/TST.NTripleLineParser.git
+[submodule "NTripleLineParser"]
+	path = src/NTripleLineParser
+	url = https://github.com/Weissger/TST.NTripleLineParser.git
+[submodule "NtripleLineParser"]
 	path = src/NTripleLineParser/
 	url = https://github.com/Weissger/TST.NTripleLineParser.git

@@ -5,69 +5,85 @@ from datetime import datetime
 from multiprocessing import Process
 import time
 
-from .RemoteSparql.PymanticRemoteSparql import PymanticRemoteSparql
-from .RemoteSparql.RequestsRemoteSparql import RequestsRemoteSparql
-from .Worker.Worker import materialize_reason
-from .NtripleParser.NtripleParser import NtripleParser
+from .Materializer.Materializer import materialize_to_file, materialize_to_service
+from .NTripleLineParser.src.NTripleLineParser import NTripleLineParser
+from .SparqlInterface.src import ClientFactory
 from .ProcessManager.ProcessManager import ProcessManager
 from .ProcessManager.ProcessManager import OccupiedError
 from .Utilities.Logger import log
 from .Utilities.Utilities import log_progress
 
 
-PYMANTIC_SUPPORTED_ENDPOINTS = []
-
-
 class TypeReasoner(object):
+
     def __init__(self, server, user, password, n_processes, log_level):
         log.setLevel(log_level)
-        self.subjectParser = NtripleParser(" ")
-        self.processManager = ProcessManager(n_processes)
+        self.nt_parser = NTripleLineParser(" ")
+        if n_processes:
+            self.processManager = ProcessManager(n_processes)
+        self.__server = ClientFactory.make_client(server=server, user=user, password=password)
 
-        # Create server instance
-        if any([x in server for x in PYMANTIC_SUPPORTED_ENDPOINTS]):
-            self.__server = PymanticRemoteSparql(server)
+    def reason(self, in_file=None, target="./reasoned/", in_service=False):
+        if in_service:
+            target = None
         else:
-            self.__server = RequestsRemoteSparql(server, user, password)
+            # Make directory
+            if not os.path.exists(target):
+                os.makedirs(target)
 
-    def reason(self, file, target):
-        # Make directory
-        if not os.path.exists(target):
-            os.makedirs(target)
+        cur_time = datetime.now()
+        if in_file:
+            log.info("Reasoning from file")
+            self.__reason_from_file(in_file, target)
+        else:
+            log.info("Reasoning from service")
+            self.__reason_from_service(target)
+        log.info("Done in: " + str(datetime.now() - cur_time))
 
+    def __reason_from_service(self, target):
+        log.critical("Reasoning from service currently not supported.")
+        pass
+
+    def __reason_from_file(self, f, target):
+        target_file = None
         # Iterate through file
-        with open(file) as input_file:
-            target_file = target + str(file).split("/")[-1][:-3] + str("_reasoned.nt")
-            tmp_subject = ""
-            cur_time = datetime.now()
+        with open(f) as input_file:
+            tmp_instance = ""
             types = set([])
             for line_num, line in enumerate(input_file):
-                triple = self.subjectParser.get_triple(line)
+                triple = self.nt_parser.get_triple(line)
                 if not triple:
                     continue
                 log_progress(line_num, 100)
 
-                # Todo Event based?
-                # Check every 0.1 seconds if we can continue
-                while not self.processManager.has_free_process_slot():
-                    time.sleep(0.1)
-
-                if not triple["subject"] == tmp_subject:
-                    p = Process(target=materialize_reason,
-                                kwargs=dict(instance=tmp_subject, types=types, target=target_file,
-                                            server=self.__server))
-                    p.daemon = True
-                    try:
-                        self.processManager.add(p)
-                    except OccupiedError as e:
-                        return 2
+                if not triple['subject'] == tmp_instance:
+                    if target:
+                        if not target_file:
+                            target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
+                        self.__spawn_daemon(materialize_to_file, dict(instance=tmp_instance, types=types, target=target_file,
+                                                                      server=self.__server))
                     else:
-                        p.start()
-                        tmp_subject = triple["subject"]
-                        # create a set
-                        types = {triple["object"]}
-                else:
-                    types.add(triple["object"])
+                        self.__spawn_daemon(materialize_to_service, dict(instance=tmp_instance, types=types, server=self.__server))
+                    tmp_instance = triple['subject']
+                    types = {triple["object"]}
 
-        log.info("Done in: " + str(datetime.now() - cur_time))
+    def __spawn_daemon(self, target, kwargs):
+        # Todo Event based?
+        # Check every 0.1 seconds if we can continue
+        if hasattr(self, "processManager"):
+            while not self.processManager.has_free_process_slot():
+                time.sleep(0.1)
+
+        p = Process(target=target, kwargs=kwargs)
+        p.daemon = True
+        if hasattr(self, "processManager"):
+            try:
+                self.processManager.add(p)
+            except OccupiedError as e:
+                log.critical(e)
+                return 2
+            else:
+                p.start()
+        else:
+            p.start()
 

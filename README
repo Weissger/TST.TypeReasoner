@@ -1,9 +1,11 @@
 =========================
- NTriple Line Parser
+ rdf:type reasoner
 =========================
 
-A simple, weak and hopefully fast tool to parse single lines of NTriple files.
-Can't handle anything special at all.
+TypeSimilarityToolSet: Reasoner to materialize type triples into a nt file or a store
+
+* Needs an initial fully reasoned subClassOf network in the store.
+* Takes a nt file with type triples and materialize missing type triples by looking for parent types of given types
 
 Authors
 =======
