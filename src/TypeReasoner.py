@@ -60,10 +60,10 @@ class TypeReasoner(object):
                 if target:
                     if not target_file:
                         target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
-                    self.__spawn_daemon(materialize_to_file, dict(rdf_instance=t, target=target_file,
+                    self.__spawn_daemon(materialize_to_file, dict(instance=t, target=target_file,
                                                                   server=self.__server))
                 else:
-                    self.__spawn_daemon(materialize_to_service, dict(rdf_instance=t, server=self.__server))
+                    self.__spawn_daemon(materialize_to_service, dict(instance=t, server=self.__server))
 
     def __reason_from_file(self, f, target):
         target_file = None
