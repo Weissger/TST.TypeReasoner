@@ -41,7 +41,23 @@ class TypeReasoner(object):
         log.info("Done in: " + str(datetime.now() - cur_time))
 
     def __reason_from_service(self, target):
-        log.critical("Reasoning from service currently not supported.")
+        target_file = None
+        rdf_instances = self.__server.query(
+            """
+        SELECT DISTINCT ?instance
+        WHERE {?instance rdf:type ?x}
+        """)
+        log.debug(rdf_instances);
+        for i, t in enumerate(rdf_instances):
+            log_progress(i, 100)
+            t = t["type"]["value"]
+            if target:
+                if not target_file:
+                    target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
+                self.__spawn_daemon(materialize_to_file, dict(rdf_instance=t, target=target_file,
+                                                              server=self.__server))
+            else:
+                self.__spawn_daemon(materialize_to_service, dict(rdf_instance=t, server=self.__server))
         pass
 
     def __reason_from_file(self, f, target):
