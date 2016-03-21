@@ -43,7 +43,7 @@ class TypeReasoner(object):
     def __reason_from_service(self, target):
         target_file = None
         offset = 0
-        step = 10000
+        step = 100000
         while True:
             rdf_instances = self.__server.query(
                 """
