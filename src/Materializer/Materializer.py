@@ -3,6 +3,7 @@ __author__ = 'tmy'
 from src.SparqlInterface.src.Interfaces.AbstractClient import SparqlConnectionError
 from src.Utilities.Logger import log
 
+
 def materialize_to_file(instance=None, target=None, server=None):
     rdf_types = __get_all_types(instance, server)
     with open(target, "a+") as f:
@@ -17,6 +18,7 @@ def materialize_to_service(instance=None, server=None):
         server.insert_triple("<" + instance + ">", " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
                              "<" + rdf_type + ">")
 
+
 def __get_all_types(instance, server):
     all_types = set([])
     retries = 0
@@ -27,7 +29,8 @@ def __get_all_types(instance, server):
                 log.debug("LOOK {}".format(type))
                 if type not in all_types:
                     log.debug("DO {}".format(type))
-                    current = server.get_all_class_parents(type).append(type)
+                    current = server.get_all_class_parents(type)
+                    current.append(type)
                     all_types.union(set(current))
         except SparqlConnectionError as e:
             if retries == 0:
