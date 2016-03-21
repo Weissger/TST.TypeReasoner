@@ -2,6 +2,7 @@ __author__ = 'tmy'
 
 from src.SparqlInterface.src.Interfaces.AbstractClient import SparqlConnectionError
 from src.Utilities.Logger import log
+from sets import Set
 
 
 def materialize_to_file(instance=None, target=None, server=None):
@@ -18,14 +19,14 @@ def materialize_to_service(instance=None, server=None):
                              "<" + rdf_type + ">")
 
 def __get_all_types(instance, server):
-    all_types = set([])
+    all_types = Set([])
     retries = 0
     while True:
         try:
             types = server.get_types(instance)
             for type in types:
                 if type not in all_types:
-                    all_types.union(set(server.get_all_class_parents(type)))
+                    all_types.union(Set(server.get_all_class_parents(type)))
         except SparqlConnectionError as e:
             if retries == 0:
                 log.warn("Error on query for: " + str(instance) + "\n" + str(e) + "\n")

@@ -48,7 +48,7 @@ class TypeReasoner(object):
             rdf_instances = self.__server.query(
                 """
             SELECT DISTINCT ?instance
-            WHERE {?instance rdf:type ?x}
+            WHERE {{?instance rdf:type ?x}}
             LIMIT {}
             OFFSET {}
             """.format(step, offset))
