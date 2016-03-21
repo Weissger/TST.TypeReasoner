@@ -31,6 +31,7 @@ def __get_all_types(instance, server):
                     log.debug("DO {}".format(type))
                     current = server.get_all_class_parents(type)
                     current.append(type)
+                    log.debug("Gives {}".format(current))
                     all_types.union(set(current))
         except SparqlConnectionError as e:
             if retries == 0:
