@@ -42,23 +42,28 @@ class TypeReasoner(object):
 
     def __reason_from_service(self, target):
         target_file = None
-        rdf_instances = self.__server.query(
-            """
-        SELECT DISTINCT ?instance
-        WHERE {?instance rdf:type ?x}
-        """)
-        log.debug(rdf_instances);
-        for i, t in enumerate(rdf_instances):
-            log_progress(i, 100)
-            t = t["type"]["value"]
-            if target:
-                if not target_file:
-                    target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
-                self.__spawn_daemon(materialize_to_file, dict(rdf_instance=t, target=target_file,
-                                                              server=self.__server))
-            else:
-                self.__spawn_daemon(materialize_to_service, dict(rdf_instance=t, server=self.__server))
-        pass
+        offset = 0
+        step = 10000
+        while True:
+            rdf_instances = self.__server.query(
+                """
+            SELECT DISTINCT ?instance
+            WHERE {?instance rdf:type ?x}
+            LIMIT {}
+            OFFSET {}
+            """.format(step, offset))
+            if len(rdf_instances) < 1:
+                break
+            for t in rdf_instances:
+                log_progress(offset, 100)
+                t = t["type"]["value"]
+                if target:
+                    if not target_file:
+                        target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
+                    self.__spawn_daemon(materialize_to_file, dict(rdf_instance=t, target=target_file,
+                                                                  server=self.__server))
+                else:
+                    self.__spawn_daemon(materialize_to_service, dict(rdf_instance=t, server=self.__server))
 
     def __reason_from_file(self, f, target):
         target_file = None
