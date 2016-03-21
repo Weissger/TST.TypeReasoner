@@ -9,6 +9,7 @@ def materialize_to_file(instance=None, target=None, server=None):
     rdf_types = __get_all_types(instance, server)
     with open(target, "a+") as f:
         for rdf_type in rdf_types:
+            log.debug("DONE {}".format(rdf_type))
             f.write("<" + instance + ">  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + rdf_type + ">.\n")
 
 
@@ -25,8 +26,11 @@ def __get_all_types(instance, server):
         try:
             types = server.get_types(instance)
             for type in types:
+                log.debug("LOOK {}".format(type))
                 if type not in all_types:
-                    all_types.union(Set(server.get_all_class_parents(type)))
+                    log.debug("DO {}".format(type))
+                    current = server.get_all_class_parents(type).append(type)
+                    all_types.union(Set(current))
         except SparqlConnectionError as e:
             if retries == 0:
                 log.warn("Error on query for: " + str(instance) + "\n" + str(e) + "\n")
@@ -38,4 +42,5 @@ def __get_all_types(instance, server):
             if retries > 0:
                 log.info("Success on retry for:" + str(instance) + "\n")
             break
+    log.debug("ALL {}".format(all_types))
     return all_types
