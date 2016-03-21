@@ -55,6 +55,7 @@ class TypeReasoner(object):
             if len(rdf_instances) < 1:
                 break
             for t in rdf_instances:
+                offset += 1
                 log_progress(offset, 100)
                 t = t["instance"]["value"]
                 if target:
