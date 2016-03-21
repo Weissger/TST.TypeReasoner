@@ -38,4 +38,4 @@ def __get_all_types(instance, server):
             if retries > 0:
                 log.info("Success on retry for:" + str(instance) + "\n")
             break
-    return parents
+    return all_types
