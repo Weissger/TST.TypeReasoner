@@ -56,7 +56,7 @@ class TypeReasoner(object):
                 break
             for t in rdf_instances:
                 log_progress(offset, 100)
-                t = t["type"]["value"]
+                t = t["instance"]["value"]
                 if target:
                     if not target_file:
                         target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
