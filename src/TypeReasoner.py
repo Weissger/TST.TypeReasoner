@@ -34,10 +34,10 @@ class TypeReasoner(object):
         cur_time = datetime.now()
         if in_file:
             log.info("Reasoning from file")
-            self.__reason_from_file(in_file, target, offset)
+            self.__reason_from_file(in_file, target, offset=offset)
         else:
             log.info("Reasoning from service")
-            self.__reason_from_service(target, offset)
+            self.__reason_from_service(target, offset=offset)
         log.info("Done in: " + str(datetime.now() - cur_time))
 
     def __reason_from_service(self, target, offset=0):
@@ -59,8 +59,6 @@ class TypeReasoner(object):
                 t = t["instance"]["value"]
                 if target:
                     if not target_file:
-                        if not os.path.exists(target):
-                            os.makedirs(target)
                         target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
                     self.__spawn_daemon(materialize_to_file, dict(instance=t, target=target_file,
                                                                   server=self.__server))
@@ -94,8 +92,6 @@ class TypeReasoner(object):
                         self.__spawn_daemon(materialize_to_service, dict(instance=tmp_instance, types=types, server=self.__server))
                     tmp_instance = triple['subject']
                     types = {triple["object"]}
-
-    def __connect_to_file(self, target):
 
     def __spawn_daemon(self, target, kwargs):
         # Todo Event based?
