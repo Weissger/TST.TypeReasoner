@@ -16,14 +16,14 @@ from .Utilities.Utilities import log_progress
 
 class TypeReasoner(object):
 
-    def __init__(self, server, user, password, n_processes, log_level, offset):
+    def __init__(self, server, user, password, n_processes, log_level):
         log.setLevel(log_level)
         self.nt_parser = NTripleLineParser(" ")
         if n_processes:
             self.processManager = ProcessManager(n_processes)
         self.__server = ClientFactory.make_client(server=server, user=user, password=password)
 
-    def reason(self, in_file=None, target="./reasoned/", in_service=False):
+    def reason(self, in_file=None, target="./reasoned/", in_service=False, offset=0):
         if in_service:
             target = None
         else:
@@ -34,10 +34,10 @@ class TypeReasoner(object):
         cur_time = datetime.now()
         if in_file:
             log.info("Reasoning from file")
-            self.__reason_from_file(in_file, target)
+            self.__reason_from_file(in_file, target, offset)
         else:
             log.info("Reasoning from service")
-            self.__reason_from_service(target)
+            self.__reason_from_service(target, offset)
         log.info("Done in: " + str(datetime.now() - cur_time))
 
     def __reason_from_service(self, target, offset):
