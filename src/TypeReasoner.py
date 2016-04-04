@@ -48,6 +48,7 @@ class TypeReasoner(object):
                 """
             SELECT DISTINCT ?instance
             WHERE {{?instance rdf:type ?x}}
+            ORDER BY ?type
             LIMIT {}
             OFFSET {}
             """.format(step, offset))
