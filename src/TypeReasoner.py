@@ -16,7 +16,7 @@ from .Utilities.Utilities import log_progress
 
 class TypeReasoner(object):
 
-    def __init__(self, server, user, password, n_processes, log_level):
+    def __init__(self, server, user, password, n_processes, log_level, offset):
         log.setLevel(log_level)
         self.nt_parser = NTripleLineParser(" ")
         if n_processes:
@@ -40,9 +40,8 @@ class TypeReasoner(object):
             self.__reason_from_service(target)
         log.info("Done in: " + str(datetime.now() - cur_time))
 
-    def __reason_from_service(self, target):
+    def __reason_from_service(self, target, offset):
         target_file = None
-        offset = 0
         step = 100000
         while True:
             rdf_instances = self.__server.query(
@@ -66,7 +65,7 @@ class TypeReasoner(object):
                 else:
                     self.__spawn_daemon(materialize_to_service, dict(instance=t, server=self.__server))
 
-    def __reason_from_file(self, f, target):
+    def __reason_from_file(self, f, target, offset):
         target_file = None
         # Iterate through file
         with open(f) as input_file:
@@ -75,6 +74,9 @@ class TypeReasoner(object):
             for line_num, line in enumerate(input_file):
                 triple = self.nt_parser.get_triple(line)
                 if not triple:
+                    offset += 1
+                    continue
+                if line_num < offset:
                     continue
                 log_progress(line_num, 100)
 

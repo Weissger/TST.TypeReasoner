@@ -13,9 +13,10 @@ import click
 @click.option('--target', '-t', default="./reasoned/",
               help='Output folder to save reasoned data to.')
 @click.option('--log-level', '-l', default="WARN")
-def main(server, user, password, log_level, n_processes, file, target):
+@click.option('--offset', '-o', default="0")
+def main(server, user, password, log_level, n_processes, file, target, offset):
 
-    reasoner = TypeReasoner(server=server, user=user, password=password, n_processes=int(n_processes), log_level=log_level)
+    reasoner = TypeReasoner(server=server, user=user, password=password, n_processes=int(n_processes), log_level=log_level, offset=int(offset))
 
     if type(file) is list:
         for f in file:
