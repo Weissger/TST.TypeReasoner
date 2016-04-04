@@ -40,7 +40,7 @@ class TypeReasoner(object):
             self.__reason_from_service(target, offset)
         log.info("Done in: " + str(datetime.now() - cur_time))
 
-    def __reason_from_service(self, target, offset):
+    def __reason_from_service(self, target, offset=0):
         target_file = None
         step = 100000
         while True:
@@ -67,7 +67,7 @@ class TypeReasoner(object):
                 else:
                     self.__spawn_daemon(materialize_to_service, dict(instance=t, server=self.__server))
 
-    def __reason_from_file(self, f, target, offset):
+    def __reason_from_file(self, f, target, offset=0):
         target_file = None
         # Iterate through file
         with open(f) as input_file:
@@ -85,6 +85,8 @@ class TypeReasoner(object):
                 if not triple['subject'] == tmp_instance:
                     if target:
                         if not target_file:
+                            if not os.path.exists(target):
+                                os.makedirs(target)
                             target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
                         self.__spawn_daemon(materialize_to_file, dict(instance=tmp_instance, types=types, target=target_file,
                                                                       server=self.__server))
@@ -92,6 +94,8 @@ class TypeReasoner(object):
                         self.__spawn_daemon(materialize_to_service, dict(instance=tmp_instance, types=types, server=self.__server))
                     tmp_instance = triple['subject']
                     types = {triple["object"]}
+
+    def __connect_to_file(self, target):
 
     def __spawn_daemon(self, target, kwargs):
         # Todo Event based?

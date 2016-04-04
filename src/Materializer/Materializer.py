@@ -4,16 +4,18 @@ from src.SparqlInterface.src.Interfaces.AbstractClient import SparqlConnectionEr
 from src.Utilities.Logger import log
 
 
-def materialize_to_file(instance=None, target=None, server=None):
-    rdf_types = __get_all_types(instance, server)
+def materialize_to_file(instance=None, types=None, target=None, server=None):
+    if not types:
+        types = __get_all_types(instance, server)
     with open(target, "a+") as f:
-        for rdf_type in rdf_types:
+        for rdf_type in types:
             f.write("<" + instance + ">  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + rdf_type + ">.\n")
 
 
-def materialize_to_service(instance=None, server=None):
-    rdf_types = __get_all_types(instance, server)
-    for rdf_type in rdf_types:
+def materialize_to_service(instance=None, types=None, server=None):
+    if not types:
+        types = __get_all_types(instance, server)
+    for rdf_type in types:
         server.insert_triple("<" + instance + ">", " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
                              "<" + rdf_type + ">")
 
