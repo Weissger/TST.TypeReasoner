@@ -59,6 +59,8 @@ class TypeReasoner(object):
                 t = t["instance"]["value"]
                 if target:
                     if not target_file:
+                        if not os.path.exists(target):
+                            os.makedirs(target)
                         target_file = target + str(self.__server.server).split("/")[-2] + str("_reasoned.nt")
                     self.__spawn_daemon(materialize_to_file, dict(instance=t, target=target_file,
                                                                   server=self.__server))
