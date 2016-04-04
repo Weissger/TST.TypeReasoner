@@ -16,13 +16,15 @@ import click
 @click.option('--offset', '-o', default="0")
 def main(server, user, password, log_level, n_processes, file, target, offset):
 
+    offset = int(offset)
+
     reasoner = TypeReasoner(server=server, user=user, password=password, n_processes=int(n_processes), log_level=log_level)
 
     if type(file) is list:
         for f in file:
-            reasoner.reason(f, target=target, offset=int(offset))
+            reasoner.reason(f, target=target, offset=offset)
     else:
-        reasoner.reason(file, target=target, offset=int(offset))
+        reasoner.reason(file, target=target, offset=offset)
 
 if __name__ == '__main__':
     main()
