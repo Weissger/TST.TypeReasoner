@@ -23,8 +23,8 @@ class TypeReasoner(object):
             self.processManager = ProcessManager(n_processes)
         self.__server = ClientFactory.make_client(server=server, user=user, password=password)
 
-    def reason(self, in_file=None, target="./reasoned/", in_service=False, offset=0):
-        if in_service:
+    def reason(self, in_file=None, target="./reasoned/", offset=0):
+        if target == "":
             target = None
         else:
             # Make directory

@@ -20,9 +20,9 @@ def main(server, user, password, log_level, n_processes, file, target, offset):
 
     if type(file) is list:
         for f in file:
-            reasoner.reason(f, target, offset)
+            reasoner.reason(f, target=target, offset=offset)
     else:
-        reasoner.reason(file, target, offset)
+        reasoner.reason(file, target=target, offset=offset)
 
 if __name__ == '__main__':
     main()
